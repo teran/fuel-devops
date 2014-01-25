@@ -241,6 +241,16 @@ class Network(ExternalModel):
         self.delete()
 
 
+class NodeControl(DriverModel):
+    name = models.CharField(max_length=255)
+    host = models.CharField(max_length=255)
+    port = models.IntegerField(max_length=5)
+    environment = models.ForeignKey(Environment, related_name='node_controls')
+
+    def __unicode__(self):
+        return u'%s:%s' % (self.host, self.port)
+
+
 class Node(ExternalModel):
     hypervisor = choices('kvm')
     os_type = choices('hvm')
@@ -251,6 +261,8 @@ class Node(ExternalModel):
     vcpu = models.PositiveSmallIntegerField(null=False, default=1)
     memory = models.IntegerField(null=False, default=1024)
     has_vnc = models.BooleanField(null=False, default=True)
+    node_control = models.ForeignKey(
+        NodeControl, related_name='nodes', null=True)
 
     def next_disk_name(self):
         disk_names = ('sd' + c for c in list('abcdefghijklmnopqrstuvwxyz'))
