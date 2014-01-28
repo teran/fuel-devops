@@ -251,8 +251,8 @@ class Network(ExternalModel):
 
 class NodeControl(DriverModel):
     name = models.CharField(max_length=255)
-    host = models.CharField(max_length=255)
-    port = models.IntegerField(max_length=5)
+    connection_string = models.CharField(max_length=255)
+    pool = models.CharField(max_length=255)
     environment = models.ForeignKey(Environment, related_name='node_controls')
 
     def __unicode__(self):
