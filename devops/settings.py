@@ -15,9 +15,20 @@
 from os import environ
 
 DRIVER = environ.get(DEVOPS_DRIVER, 'devops.driver.libvirt.libvirt_driver')
-DRIVER_PARAMETERS = {
-    'connection_string': environ.get('CONNECTION_STRING', 'qemu:///system'),
-    'storage_pool_name': environ.get('STORAGE_POOL_NAME', 'default'),
+
+CONTROL_NODES = {
+    'srv07-srt': {
+        'connection_string': 'qemu+tcp://srv07-srt.srt.mirantis.net:16509/system',
+        'storage_pool_name': 'default',
+    },
+    'srv08-srt': {
+        'connection_string': 'qemu+tcp://srv08-srt.srt.mirantis.net:16509/system',
+        'storage_pool_name': 'default',
+    },
+    'srv11-msk': {
+        'connection_string': 'qemu+tcp://srv11-msk.msk.mirantis.net:16509/system',
+        'storage_pool_name': 'default',
+    },
 }
 
 INSTALLED_APPS = ['south', 'devops']
