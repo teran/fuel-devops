@@ -17,7 +17,7 @@ import random
 from django.utils.importlib import import_module
 from django.conf import settings
 
-from devops.models import NodeControl
+from devops.models import NodeControl, Node
 from devops.helpers.decorators import singleton
 
 
@@ -55,3 +55,46 @@ class DriverManager():
         else:
             for conn in self.pool.items():
                 conn.close()
+
+    def node_active(self, node):
+        pass
+
+    def node_create(self, node):
+        pass
+
+    def node_create_snapshot(self, node, name, description):
+        pass
+
+    def node_delete_snapshot(self, node, snapshot):
+        pass
+
+    def node_list(self):
+        return_list = []
+        for node in self.pool.keys():
+            return_list.append(self.pool[node].node_list())
+
+        return return_list
+
+    def node_revert_snapshot(self, node, snapshot):
+        pass
+
+    def node_snapshot_exists(self, node, snapshot):
+        pass
+
+    def node_suspend(self, node):
+        pass
+
+    def node_undefine_by_name(self, name):
+        pass
+
+    def network_create(self, network):
+        pass
+
+    def network_destroy(self, network):
+        pass
+
+    def network_undefine(self, network):
+        pass
+
+    def node_get_vnc_port(self, node):
+        pass
