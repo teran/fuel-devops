@@ -25,17 +25,18 @@ class UseCases(unittest.TestCase):
     manager = manager.Manager()
 
     def test_volumes_for_pptesting(self):
+        ubuntu_image = 'ubuntu-12.04.3-desktop-amd64.iso'
+        centos_image = 'centos6.4-base.qcow2'
+
         images_for_upload = {
-            "ubuntu-12.04.3-desktop-amd64.iso":
-                "/tmp/ubuntu-12.04.3-desktop-amd64.iso",
-            "centos6.4-base.qcow2":
-                "/tmp/centos6.4-base.qcow2",
-            }
+            ubuntu_image: '/tmp/%s' % ubuntu_image,
+            centos_image: '/tmp/%s' % centos_image,
+        }
 
         for name, vol in images_for_upload.iteritems():
-            v = self.manager.volume_create(name,
-                                           _get_file_size(vol))
+            v = self.manager.volume_create(
+                name,
+                _get_file_size(vol))
             if not self.driver.volume_exists(v):
                 self.driver.volume_define(v)
                 self.driver.volume_upload(v, vol)
-

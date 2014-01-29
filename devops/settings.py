@@ -18,15 +18,15 @@ DRIVER = environ.get(DEVOPS_DRIVER, 'devops.driver.libvirt.libvirt_driver')
 
 CONTROL_NODES = {
     'srv07-srt': {
-        'connection_string': 'qemu+tcp://srv07-srt.srt.mirantis.net:16509/system',
+        'connection_string': 'qemu+tcp://srv07-srt.srt.mirantis.net/system',
         'storage_pool_name': 'default',
     },
     'srv08-srt': {
-        'connection_string': 'qemu+tcp://srv08-srt.srt.mirantis.net:16509/system',
+        'connection_string': 'qemu+tcp://srv08-srt.srt.mirantis.net/system',
         'storage_pool_name': 'default',
     },
     'srv11-msk': {
-        'connection_string': 'qemu+tcp://srv11-msk.msk.mirantis.net:16509/system',
+        'connection_string': 'qemu+tcp://srv11-msk.msk.mirantis.net/system',
         'storage_pool_name': 'default',
     },
 }

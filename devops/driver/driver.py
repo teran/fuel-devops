@@ -28,7 +28,8 @@ class DriverManager():
         self.driver = import_module(settings.DRIVER)
         for k in settings.CONTROL_NODES.keys():
             nc, created = NodeControl.objects.get_or_create(
-                connection_string=settings.CONTROL_NODES[k]['connection_string']
+                connection_string=settings.CONTROL_NODES[k][
+                    'connection_string']
             )
 
             if created:
