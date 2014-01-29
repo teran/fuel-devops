@@ -28,7 +28,7 @@ import BaseHTTPServer
 from threading import Thread
 from SimpleHTTPServer import SimpleHTTPRequestHandler
 
-from devops.helpers.retry import retry
+from devops.helpers.decorators import retry
 from devops.error import DevopsError, DevopsCalledProcessError, TimeoutError, \
     AuthenticationError
 

@@ -21,7 +21,7 @@ import xml.etree.ElementTree as ET
 from devops.driver.libvirt.libvirt_xml_builder import LibvirtXMLBuilder
 from devops.helpers import scancodes
 from devops.helpers.helpers import _get_file_size
-from devops.helpers.retry import retry
+from devops.helpers.decorators import retry
 
 from django.conf import settings
 

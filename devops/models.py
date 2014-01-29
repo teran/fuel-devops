@@ -49,10 +49,14 @@ class DriverModel(models.Model):
         """
         :rtype : DevopsDriver
         """
-        driver = import_module(settings.DRIVER)
-        cls._driver = cls._driver or driver.DevopsDriver(
-            **settings.DRIVER_PARAMETERS)
-        return cls._driver
+        #driver = import_module(settings.DRIVER)
+        #cls._driver = cls._driver or driver.DevopsDriver(
+        #    **settings.DRIVER_PARAMETERS)
+        #return cls._driver
+        from devops.driver import driver
+        cls.driver = driver.DriverManager()
+
+        return cls.driver
 
     @property
     def driver(self):

@@ -24,8 +24,8 @@ class DriverManager():
     pool = {}
     driver = None
 
-    def __init__(self, driver):
-        self.driver = import_module(settings.DRIVER)
+    def __init__(self, driver=None):
+        self.driver = import_module(driver or settings.DRIVER)
         for k in settings.CONTROL_NODES.keys():
             nc, created = NodeControl.objects.get_or_create(
                 connection_string=settings.CONTROL_NODES[k][
