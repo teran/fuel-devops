@@ -22,6 +22,7 @@ from django.db import models
 from django.utils.importlib import import_module
 
 from devops.helpers.helpers import SSHClient, _wait, _tcp_ping
+from devops.driver import driver
 
 
 def choices(*args, **kwargs):
@@ -49,11 +50,6 @@ class DriverModel(models.Model):
         """
         :rtype : DevopsDriver
         """
-        #driver = import_module(settings.DRIVER)
-        #cls._driver = cls._driver or driver.DevopsDriver(
-        #    **settings.DRIVER_PARAMETERS)
-        #return cls._driver
-        from devops.driver import driver
         cls.driver = driver.DriverManager()
 
         return cls.driver
