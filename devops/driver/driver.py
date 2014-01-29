@@ -18,8 +18,10 @@ from django.utils.importlib import import_module
 from django.conf import settings
 
 from devops.models import NodeControl
+from devops.helpers.decorators import singleton
 
 
+@singleton
 class DriverManager():
     pool = {}
     driver = None
