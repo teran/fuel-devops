@@ -35,3 +35,12 @@ def retry(count=10, delay=1):
         return wrapper
 
     return decorator
+
+
+def singleton(cls):
+    instances = {}
+    def getinstance():
+        if cls not in instances:
+            instances[cls] = cls()
+        return instances[cls]
+    return getinstance

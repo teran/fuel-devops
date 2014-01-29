@@ -29,7 +29,7 @@ from threading import Thread
 from SimpleHTTPServer import SimpleHTTPRequestHandler
 
 from devops import logger
-from devops.helpers.retry import retry
+from devops.helpers.decorators import retry
 from devops.error import DevopsError, DevopsCalledProcessError, TimeoutError, \
     AuthenticationError
 
