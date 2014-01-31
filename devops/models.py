@@ -197,6 +197,9 @@ class Network(ExternalModel):
         'passthrough', 'hostdev', null=True)
     ip_network = models.CharField(max_length=255, unique=True)
 
+    def __unicode__(self):
+        return self.name
+
     @property
     def interfaces(self):
         return Interface.objects.filter(network=self)
@@ -257,7 +260,7 @@ class NodeControl(DriverModel):
     environment = models.ForeignKey(Environment, related_name='node_controls')
 
     def __unicode__(self):
-        return u'%s:%s' % (self.host, self.port)
+        return self.name
 
 
 class Node(ExternalModel):
@@ -272,6 +275,9 @@ class Node(ExternalModel):
     has_vnc = models.BooleanField(null=False, default=True)
     node_control = models.ForeignKey(
         NodeControl, related_name='nodes', null=True)
+
+    def __unicode__(self):
+        return self.name
 
     def next_disk_name(self):
         disk_names = ('sd' + c for c in list('abcdefghijklmnopqrstuvwxyz'))
@@ -421,6 +427,9 @@ class Interface(models.Model):
     type = models.CharField(max_length=255, null=False)
     model = choices('virtio', 'e1000', 'pcnet', 'rtl8139', 'ne2k_pci')
 
+    def __unicode__(self):
+        return self.mac_address
+
     @property
     def target_dev(self):
         return self.node.driver.node_get_interface_target_dev(
@@ -437,3 +446,6 @@ class Interface(models.Model):
 class Address(models.Model):
     ip_address = models.GenericIPAddressField()
     interface = models.ForeignKey(Interface)
+
+    def __unicode__(self):
+        return self.ip_address
