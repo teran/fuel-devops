@@ -52,6 +52,10 @@ class DriverManager():
     def get_first_control_driver(self):
         return self.pool[:1]
 
+    def get_control_driver_by_node_name(self, node_name):
+        nc = NodeControl.objects.get(node__name=node.name)
+        return self.pool[nc.name]
+
     def disconnect(self, name=None):
         if name:
             self.pool[name].close()
@@ -60,8 +64,9 @@ class DriverManager():
                 driver.__del__()
 
     def node_active(self, node):
-        nc = NodeControl.objects.get(node__name=node)
-        return self.pool[nc.name].node_active(node=node)
+        self.get_control_driver_by_node_name(
+            node.name
+        ).node_active(node=node)
 
     def node_create(self, node, node_control=None):
         if node_control:
@@ -70,16 +75,16 @@ class DriverManager():
             self.get_random_control_driver().node_create(node=node)
 
     def node_create_snapshot(self, node, name, description):
-        nc = NodeControl.objects.get(node__name=node.name)
-        self.pool[nc.name].node_create_snapshot(
+        self.get_control_driver_by_node_name(node.name).node_create_snapshot(
             node=node,
             name=name,
             description=description
         )
 
     def node_delete_snapshot(self, node, name=None):
-        nc = NodeControl.objects.get(node__name=node.name)
-        self.pool[nc.name].node_delete_snapshot(node=node, name=name)
+        self.get_control_driver_by_node_name(
+            node.name
+        ).node_delete_snapshot(node=node, name=name)
 
 
     def node_list(self):
@@ -90,12 +95,15 @@ class DriverManager():
         return return_list
 
     def node_revert_snapshot(self, node, name=None):
-        nc = NodeControl.objects.get(node__name=node.name)
-        self.pool[nc.name].node_revert_snapshot(node=node, name=name)
+        self.get_control_driver_by_node_name(
+            node.name
+        ).node_revert_snapshot(node=node, name=name)
 
 
     def node_snapshot_exists(self, node, name):
-        pass
+        self.get_control_driver_by_node_name(
+            node.name
+        ).node_snapshot_exists(node, name)
 
     def node_suspend(self, node):
         pass
