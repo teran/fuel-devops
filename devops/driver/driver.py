@@ -49,24 +49,38 @@ class DriverManager():
     def get_random_control_driver(self):
         return self.pool[random.choice(self.pool.keys())]
 
+    def get_first_control_driver(self):
+        return self.pool[:1]
+
     def disconnect(self, name=None):
         if name:
             self.pool[name].close()
         else:
-            for conn in self.pool.items():
-                conn.close()
+            for driver in self.pool:
+                driver.__del__()
 
     def node_active(self, node):
-        pass
+        nc = NodeControl.objects.get(node__name=node)
+        return self.pool[nc.name].node_active(node=node)
 
-    def node_create(self, node):
-        pass
+    def node_create(self, node, node_control=None):
+        if node_control:
+            self.pool[node_control].node_create(node=node)
+        else:
+            self.get_random_control_driver().node_create(node=node)
 
     def node_create_snapshot(self, node, name, description):
-        pass
+        nc = NodeControl.objects.get(node__name=node.name)
+        self.pool[nc.name].node_create_snapshot(
+            node=node,
+            name=name,
+            description=description
+        )
 
-    def node_delete_snapshot(self, node, snapshot):
-        pass
+    def node_delete_snapshot(self, node, name=None):
+        nc = NodeControl.objects.get(node__name=node.name)
+        self.pool[nc.name].node_delete_snapshot(node=node, name=name)
+
 
     def node_list(self):
         return_list = []
@@ -75,10 +89,12 @@ class DriverManager():
 
         return return_list
 
-    def node_revert_snapshot(self, node, snapshot):
-        pass
+    def node_revert_snapshot(self, node, name=None):
+        nc = NodeControl.objects.get(node__name=node.name)
+        self.pool[nc.name].node_revert_snapshot(node=node, name=name)
 
-    def node_snapshot_exists(self, node, snapshot):
+
+    def node_snapshot_exists(self, node, name):
         pass
 
     def node_suspend(self, node):
@@ -88,13 +104,16 @@ class DriverManager():
         pass
 
     def network_create(self, network):
-        pass
+        for driver in self.pool:
+            driver.network_create(network=network)
 
     def network_destroy(self, network):
-        pass
+        for driver in self.pool:
+            driver.network_destroy(network=network)
 
     def network_undefine(self, network):
-        pass
+        for driver in self.pool:
+            driver.network_undefine(network=network)
 
     def node_get_vnc_port(self, node):
         pass
