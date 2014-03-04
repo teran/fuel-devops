@@ -17,6 +17,23 @@ import functools
 from time import sleep
 
 
+def debug(logger):
+    def wrapper(func):
+        @functools.wraps(func)
+        def wrapped(*args, **kwargs):
+            logger.debug(
+                "Calling: {}.{} with args: {} {}".format(
+                    logger.name, func.__name__, args, kwargs
+                )
+            )
+            result = func(*args, **kwargs)
+            logger.debug(
+                "Done: {}.{} with result: {}".format(
+                    logger.name, func.__name__, result))
+            return result
+        return wrapped
+    return wrapper
+
 def retry(count=10, delay=1):
     def decorator(func):
         @functools.wraps(func)
@@ -35,7 +52,6 @@ def retry(count=10, delay=1):
         return wrapper
 
     return decorator
-
 
 def singleton(cls):
     instances = {}
