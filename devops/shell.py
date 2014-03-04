@@ -17,7 +17,7 @@ import argparse
 from os import environ
 
 from devops.manager import Manager
-
+from devops.driver.driver import DriverManager
 
 class Shell(object):
     def __init__(self):
@@ -72,7 +72,14 @@ class Shell(object):
     def do_synchronize(self):
         self.manager.synchronize_environments()
 
+    def do_list_controls(self):
+        self.driver = DriverManager()
+        for i in self.driver.pool.keys():
+            print('%s: %s' % (
+                i, str(self.driver.pool.get(i))))
+
     commands = {
+        'list_controls': do_list_controls,
         'list': do_list,
         'show': do_show,
         'erase': do_erase,
@@ -82,7 +89,7 @@ class Shell(object):
         'resume': do_resume,
         'revert': do_revert,
         'snapshot': do_snapshot,
-        'sync': do_synchronize
+        'sync': do_synchronize,
     }
 
     def get_params(self):
@@ -96,6 +103,7 @@ class Shell(object):
         parser = argparse.ArgumentParser(
             description="Manage virtual environments")
         subparsers = parser.add_subparsers(help='commands', dest='command')
+        subparsers.add_parser('list_controls')
         subparsers.add_parser('list')
         subparsers.add_parser('show', parents=[name_parser])
         subparsers.add_parser('erase', parents=[name_parser])
@@ -108,4 +116,5 @@ class Shell(object):
         subparsers.add_parser('snapshot',
                               parents=[name_parser, snapshot_name_parser])
         subparsers.add_parser('sync')
+
         return parser.parse_args()

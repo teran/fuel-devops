@@ -5,3 +5,4 @@ MANIFEST
 *.pyc
 TAGS
 local_settings.py
+*.sqlite

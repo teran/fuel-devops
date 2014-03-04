@@ -17,9 +17,7 @@ import random
 from django.utils.importlib import import_module
 from django.conf import settings
 
-from devops.models import NodeControl, Node
 from devops.helpers.decorators import singleton
-
 
 @singleton
 class DriverManager():
@@ -29,19 +27,18 @@ class DriverManager():
     def __init__(self, driver=None):
         self.driver = import_module(driver or settings.DRIVER)
         for k in settings.CONTROL_NODES.keys():
-            nc, created = NodeControl.objects.get_or_create(
-                connection_string=settings.CONTROL_NODES[k][
-                    'connection_string']
-            )
-
-            if created:
-                nc.name = k
-                nc.save()
-
             if not self.pool.get(k):
                 self.pool[k] = self.driver.DevopsDriver(
                     **settings.CONTROL_NODES[k]
                 )
+
+    def get_allocated_networks(self):
+        allocated_networks = set()
+        for i in self.pool.keys():
+            for k in self.pool.get(i).get_allocated_networks():
+                allocated_networks.add(k)
+
+        return allocated_networks
 
     def get_control_driver(self, name):
         return self.pool[name]
@@ -125,3 +122,6 @@ class DriverManager():
 
     def node_get_vnc_port(self, node):
         pass
+
+    def volume_capacity(self, volume):
+        return self.pool.get('srv11-msk').volume_capacity(volume)
