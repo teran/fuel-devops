@@ -14,7 +14,7 @@
 
 from os import environ
 
-DRIVER = environ.get(DEVOPS_DRIVER, 'devops.driver.libvirt.libvirt_driver')
+DRIVER = environ.get('DEVOPS_DRIVER', 'devops.driver.libvirt.libvirt_driver')
 
 CONTROL_NODES = {
     'srv07-srt': {
