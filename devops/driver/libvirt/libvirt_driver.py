@@ -30,6 +30,7 @@ class DevopsDriver(object):
     def __init__(self,
                  connection_string="qemu:///system",
                  storage_pool_name="default"):
+        self.connection_string = connection_string
         libvirt.virInitialize()
         self.conn = libvirt.open(connection_string)
         self.xml_builder = LibvirtXMLBuilder(self)
@@ -42,6 +43,12 @@ class DevopsDriver(object):
 
     def __del__(self):
         self.conn.close()
+
+    def __str__(self):
+        return self.connection_string
+
+    def __unicode__(self):
+        return self.connection_string
 
     def _get_name(self, *kwargs):
         return self.xml_builder._get_name(*kwargs)
