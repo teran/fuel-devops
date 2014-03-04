@@ -380,6 +380,11 @@ class Volume(ExternalModel):
     capacity = models.BigIntegerField(null=False)
     backing_store = models.ForeignKey('self', null=True)
     format = models.CharField(max_length=255, null=False)
+    node_control = models.ForeignKey(
+        NodeControl, related_name='volumes', null=True)
+
+    def __unicode__(self):
+        return self.get_path()
 
     def define(self):
         self.driver.volume_define(self)

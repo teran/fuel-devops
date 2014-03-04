@@ -13,18 +13,25 @@
 #    under the License.
 
 import json
+import logging
 
 from ipaddr import IPNetwork, IPAddress
 from xmlbuilder import XMLBuilder
 
+from devops.helpers.decorators import debug
+
+logger = logging.getLogger(__name__)
+logwrap = debug(logger)
 
 class LibvirtXMLBuilder(object):
+    @logwrap
     def __init__(self, driver):
         super(LibvirtXMLBuilder, self).__init__()
         self.driver = driver
 
     NAME_SIZE = 80
 
+    @logwrap
     def _get_name(self, *args):
         name = '_'.join(filter(None, list(args)))
         if len(name) > self.NAME_SIZE:
@@ -32,6 +39,7 @@ class LibvirtXMLBuilder(object):
             name = hash_str + name[len(name) - self.NAME_SIZE + len(hash_str):]
         return name
 
+    @logwrap
     def build_network_xml(self, network):
         """
         :type network: Network
@@ -69,6 +77,7 @@ class LibvirtXMLBuilder(object):
 
         return str(network_xml)
 
+    @logwrap
     def build_volume_xml(self, volume):
         """
         :type volume: Volume
@@ -88,6 +97,7 @@ class LibvirtXMLBuilder(object):
                 volume_xml.format(type=volume.backing_store.format)
         return str(volume_xml)
 
+    @logwrap
     def build_snapshot_xml(self, name=None, description=None):
         """
         :rtype : String
@@ -101,6 +111,7 @@ class LibvirtXMLBuilder(object):
             xml_builder.description(description)
         return str(xml_builder)
 
+    @logwrap
     def _build_disk_device(self, device_xml, disk_device):
         with device_xml.disk(type=disk_device.type, device=disk_device.device):
             #https://bugs.launchpad.net/ubuntu/+source/qemu-kvm/+bug/741887
@@ -108,6 +119,7 @@ class LibvirtXMLBuilder(object):
             device_xml.source(file=self.driver.volume_path(disk_device.volume))
             device_xml.target(dev=disk_device.target_dev, bus=disk_device.bus)
 
+    @logwrap
     def _build_interface_device(self, device_xml, interface):
         if interface.type != 'network':
             raise NotImplementedError(
@@ -121,6 +133,7 @@ class LibvirtXMLBuilder(object):
             if not (interface.type is None):
                 device_xml.model(type=interface.model)
 
+    @logwrap
     def build_node_xml(self, node, emulator):
         """
         :rtype : String

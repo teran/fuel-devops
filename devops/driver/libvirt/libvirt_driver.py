@@ -14,6 +14,7 @@
 
 import ipaddr
 import libvirt
+import logging
 
 from time import sleep
 import xml.etree.ElementTree as ET
@@ -22,12 +23,15 @@ from devops import logger
 from devops.driver.libvirt.libvirt_xml_builder import LibvirtXMLBuilder
 from devops.helpers import scancodes
 from devops.helpers.helpers import _get_file_size
-from devops.helpers.decorators import retry
+from devops.helpers.decorators import retry, debug
 
 from django.conf import settings
 
+logger = logging.getLogger(__name__)
+logwrap = debug(logger)
 
 class DevopsDriver(object):
+    @logwrap
     def __init__(self,
                  connection_string="qemu:///system",
                  storage_pool_name="default"):
@@ -42,18 +46,23 @@ class DevopsDriver(object):
         if settings.VNC_PASSWORD:
             self.vnc_password = settings.VNC_PASSWORD
 
+    @logwrap
     def __del__(self):
         self.conn.close()
 
+    @logwrap
     def __str__(self):
         return self.connection_string
 
+    @logwrap
     def __unicode__(self):
         return self.connection_string
 
+    @logwrap
     def _get_name(self, *kwargs):
         return self.xml_builder._get_name(*kwargs)
 
+    @logwrap
     @retry()
     def get_capabilities(self):
         """
@@ -63,6 +72,7 @@ class DevopsDriver(object):
             self.capabilities = self.conn.getCapabilities()
         return ET.fromstring(self.capabilities)
 
+    @logwrap
     @retry()
     def network_bridge_name(self, network):
         """
@@ -71,6 +81,7 @@ class DevopsDriver(object):
         """
         return self.conn.networkLookupByUUIDString(network.uuid).bridgeName()
 
+    @logwrap
     @retry()
     def network_name(self, network):
         """
@@ -79,6 +90,7 @@ class DevopsDriver(object):
         """
         return self.conn.networkLookupByUUIDString(network.uuid).name()
 
+    @logwrap
     @retry()
     def network_active(self, network):
         """
@@ -87,6 +99,7 @@ class DevopsDriver(object):
         """
         return self.conn.networkLookupByUUIDString(network.uuid).isActive()
 
+    @logwrap
     @retry()
     def node_active(self, node):
         """
@@ -95,6 +108,7 @@ class DevopsDriver(object):
         """
         return self.conn.lookupByUUIDString(node.uuid).isActive()
 
+    @logwrap
     @retry()
     def network_exists(self, network):
         """
@@ -110,6 +124,7 @@ class DevopsDriver(object):
             else:
                 raise
 
+    @logwrap
     @retry()
     def node_exists(self, node):
         """
@@ -125,6 +140,7 @@ class DevopsDriver(object):
             else:
                 raise
 
+    @logwrap
     @retry()
     def node_snapshot_exists(self, node, name):
         """
@@ -141,6 +157,7 @@ class DevopsDriver(object):
             else:
                 raise
 
+    @logwrap
     @retry()
     def volume_exists(self, volume):
         """
@@ -156,6 +173,7 @@ class DevopsDriver(object):
             else:
                 raise
 
+    @logwrap
     @retry()
     def network_define(self, network):
         """
@@ -166,6 +184,7 @@ class DevopsDriver(object):
         ret.setAutostart(True)
         network.uuid = ret.UUIDString()
 
+    @logwrap
     @retry()
     def network_destroy(self, network):
         """
@@ -173,6 +192,7 @@ class DevopsDriver(object):
         """
         self.conn.networkLookupByUUIDString(network.uuid).destroy()
 
+    @logwrap
     @retry()
     def network_undefine(self, network):
         """
@@ -180,6 +200,7 @@ class DevopsDriver(object):
         """
         self.conn.networkLookupByUUIDString(network.uuid).undefine()
 
+    @logwrap
     @retry()
     def network_create(self, network):
         """
@@ -187,6 +208,7 @@ class DevopsDriver(object):
         """
         self.conn.networkLookupByUUIDString(network.uuid).create()
 
+    @logwrap
     @retry()
     def node_define(self, node):
         """
@@ -202,6 +224,7 @@ class DevopsDriver(object):
         logger.info(node_xml)
         node.uuid = self.conn.defineXML(node_xml).UUIDString()
 
+    @logwrap
     @retry()
     def node_destroy(self, node):
         """
@@ -210,6 +233,7 @@ class DevopsDriver(object):
         """
         self.conn.lookupByUUIDString(node.uuid).destroy()
 
+    @logwrap
     @retry()
     def node_undefine(self, node, undefine_snapshots=False):
         """
@@ -223,6 +247,7 @@ class DevopsDriver(object):
         else:
             domain.undefine()
 
+    @logwrap
     @retry()
     def node_undefine_by_name(self, node_name):
         """
@@ -232,6 +257,7 @@ class DevopsDriver(object):
         domain = self.conn.lookupByName(node_name)
         domain.undefineFlags(libvirt.VIR_DOMAIN_UNDEFINE_SNAPSHOTS_METADATA)
 
+    @logwrap
     @retry()
     def node_get_vnc_port(self, node):
         """
@@ -244,6 +270,7 @@ class DevopsDriver(object):
         if vnc_element is not None:
             return vnc_element.get('port')
 
+    @logwrap
     @retry()
     def node_get_interface_target_dev(self, node, mac):
         """
@@ -257,6 +284,7 @@ class DevopsDriver(object):
         if target is not None:
             return target.get('dev')
 
+    @logwrap
     @retry()
     def node_create(self, node):
         """
@@ -265,12 +293,14 @@ class DevopsDriver(object):
         """
         self.conn.lookupByUUIDString(node.uuid).create()
 
+    @logwrap
     @retry()
     def node_list(self):
         # virConnect.listDefinedDomains() only returns stopped domains
         #   https://bugzilla.redhat.com/show_bug.cgi?id=839259
         return [item.name() for item in self.conn.listAllDomains()]
 
+    @logwrap
     @retry()
     def node_reset(self, node):
         """
@@ -279,6 +309,7 @@ class DevopsDriver(object):
         """
         self.conn.lookupByUUIDString(node.uuid).reset()
 
+    @logwrap
     @retry()
     def node_reboot(self, node):
         """
@@ -287,6 +318,7 @@ class DevopsDriver(object):
         """
         self.conn.lookupByUUIDString(node.uuid).reboot()
 
+    @logwrap
     @retry()
     def node_suspend(self, node):
         """
@@ -295,6 +327,7 @@ class DevopsDriver(object):
         """
         self.conn.lookupByUUIDString(node.uuid).suspend()
 
+    @logwrap
     @retry()
     def node_resume(self, node):
         """
@@ -303,6 +336,7 @@ class DevopsDriver(object):
         """
         self.conn.lookupByUUIDString(node.uuid).resume()
 
+    @logwrap
     @retry()
     def node_shutdown(self, node):
         """
@@ -311,6 +345,7 @@ class DevopsDriver(object):
         """
         self.conn.lookupByUUIDString(node.uuid).shutdown()
 
+    @logwrap
     @retry()
     def node_get_snapshots(self, node):
         """
@@ -319,6 +354,7 @@ class DevopsDriver(object):
         """
         return self.conn.lookupByUUIDString(node.uuid).snapshotListNames(0)
 
+    @logwrap
     @retry()
     def node_create_snapshot(self, node, name=None, description=None):
         """
@@ -334,6 +370,7 @@ class DevopsDriver(object):
         domain.snapshotCreateXML(xml, 0)
         logger.info(domain.state(0))
 
+    @logwrap
     def _get_snapshot(self, domain, name):
         """
         :type name: String
@@ -344,6 +381,7 @@ class DevopsDriver(object):
         else:
             return domain.snapshotLookupByName(name, 0)
 
+    @logwrap
     @retry()
     def node_revert_snapshot(self, node, name=None):
         """
@@ -355,6 +393,7 @@ class DevopsDriver(object):
         snapshot = self._get_snapshot(domain, name)
         domain.revertToSnapshot(snapshot, 0)
 
+    @logwrap
     @retry()
     def node_delete_all_snapshots(self, node):
         domain = self.conn.lookupByUUIDString(node.uuid)
@@ -363,6 +402,7 @@ class DevopsDriver(object):
             snapshot = self._get_snapshot(domain, name)
             snapshot.delete(libvirt.VIR_DOMAIN_SNAPSHOT_DELETE_CHILDREN)
 
+    @logwrap
     @retry()
     def node_delete_snapshot(self, node, name=None):
         """
@@ -373,6 +413,7 @@ class DevopsDriver(object):
         snapshot = self._get_snapshot(domain, name)
         snapshot.delete(0)
 
+    @logwrap
     @retry()
     def node_send_keys(self, node, keys):
         """
@@ -390,6 +431,7 @@ class DevopsDriver(object):
                                                             list(key_code),
                                                             len(key_code), 0)
 
+    @logwrap
     @retry()
     def volume_define(self, volume, pool=None):
         """
@@ -403,13 +445,16 @@ class DevopsDriver(object):
             self.xml_builder.build_volume_xml(volume), 0)
         volume.uuid = libvirt_volume.key()
 
+    @logwrap
     @retry()
     def volume_path(self, volume):
         return self.conn.storageVolLookupByKey(volume.uuid).path()
 
+    @logwrap
     def chunk_render(self, stream, size, fd):
         return fd.read(size)
 
+    @logwrap
     @retry(count=2)
     def volume_upload(self, volume, path):
         size = _get_file_size(path)
@@ -421,6 +466,7 @@ class DevopsDriver(object):
             stream.sendAll(self.chunk_render, fd)
             stream.finish()
 
+    @logwrap
     @retry()
     def volume_delete(self, volume):
         """
@@ -429,6 +475,7 @@ class DevopsDriver(object):
         """
         self.conn.storageVolLookupByKey(volume.uuid).delete(0)
 
+    @logwrap
     @retry()
     def volume_capacity(self, volume):
         """
@@ -437,6 +484,7 @@ class DevopsDriver(object):
         """
         return self.conn.storageVolLookupByKey(volume.uuid).info()[1]
 
+    @logwrap
     @retry()
     def volume_format(self, volume):
         """
@@ -447,6 +495,7 @@ class DevopsDriver(object):
             self.conn.storageVolLookupByKey(volume.uuid).XMLDesc(0))
         return xml_desc.find('target/format[@type]').get('type')
 
+    @logwrap
     @retry()
     def get_allocated_networks(self):
         """
