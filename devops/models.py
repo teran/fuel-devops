@@ -24,6 +24,7 @@ from devops.helpers.helpers import SSHClient, _wait, _tcp_ping
 
 from devops import logger
 from devops.driver import driver
+from devops import logger
 
 
 def choices(*args, **kwargs):
