@@ -14,21 +14,26 @@
 
 from os import environ
 
-DRIVER = environ.get('DEVOPS_DRIVER', 'devops.driver.libvirt.libvirt_driver')
-
 CONTROL_NODES = {
     'srv07-srt': {
+        'driver': 'devops.driver.libvirt.libvirt_driver',
         'connection_string': 'qemu+tcp://srv07-srt.srt.mirantis.net/system',
         'storage_pool_name': 'default',
     },
     'srv08-srt': {
+        'driver': 'devops.driver.libvirt.libvirt_driver',
         'connection_string': 'qemu+tcp://srv08-srt.srt.mirantis.net/system',
         'storage_pool_name': 'default',
     },
     'srv11-msk': {
+        'driver': 'devops.driver.libvirt.libvirt_driver',
         'connection_string': 'qemu+tcp://srv11-msk.msk.mirantis.net/system',
         'storage_pool_name': 'default',
     },
+    'mc0n8': {
+        'driver': 'devops.driver.libvirt.ipmi_driver',
+        'connection_string': 'ipmi://login:password@ipmiaddress',
+    }
 }
 
 INSTALLED_APPS = ['south', 'devops']
