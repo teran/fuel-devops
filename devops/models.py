@@ -54,8 +54,6 @@ class DriverModel(models.Model):
         """
         cls.driver = driver.DriverManager()
 
-        logger.debug('get_driver returned: %s' % cls.driver)
-
         return cls.driver
 
     @property
@@ -385,9 +383,6 @@ class Volume(ExternalModel):
     format = models.CharField(max_length=255, null=False)
     node_control = models.ForeignKey(
         NodeControl, related_name='volumes', null=True)
-
-    def __unicode__(self):
-        return self.get_path()
 
     def define(self):
         self.driver.volume_define(self)

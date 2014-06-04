@@ -62,7 +62,8 @@ class DriverManager():
 
     @logwrap
     def get_control_driver_by_node_name(self, node_name):
-        nc = NodeControl.objects.get(node__name=node.name)
+        from devops.models import NodeControl
+        nc = NodeControl.objects.get(nodes__name=node_name)
         return self.pool[nc.name]
 
     @logwrap
@@ -72,6 +73,27 @@ class DriverManager():
         else:
             for driver in self.pool:
                 driver.__del__()
+
+    @logwrap
+    def network_active(self, network):
+        ret = {}
+        for control in self.pool.keys():
+            ret[control] = self.pool[control].network_active(network=network)
+
+        return ret
+
+    @logwrap
+    def network_define(self, network):
+        for driver in self.pool.values():
+            driver.network_define(network=network)
+
+    @logwrap
+    def network_exists(self, network):
+        ret = {}
+        for control in self.pool.keys():
+            ret[control] = self.pool[control].network_exists(network=network)
+
+        return ret
 
     @logwrap
     def node_active(self, node):
@@ -135,7 +157,7 @@ class DriverManager():
 
     @logwrap
     def network_destroy(self, network):
-        for driver in self.pool:
+        for driver in self.pool.values():
             driver.network_destroy(network=network)
 
     def node_exists(self, node):
@@ -147,10 +169,16 @@ class DriverManager():
                 return ne
         return False
 
+
     @logwrap
     def network_undefine(self, network):
-        for driver in self.pool:
+        for driver in self.pool.values():
             driver.network_undefine(network=network)
+
+    @logwrap
+    def node_define(self, node):
+        for driver in self.pool.values():
+            driver.network_define(node)
 
     @logwrap
     def node_get_vnc_port(self, node):
@@ -160,5 +188,25 @@ class DriverManager():
     def volume_capacity(self, volume):
         return self.pool.get(volume.node_control.name).volume_capacity(volume)
 
+    @logwrap
+    def volume_define(self, volume, pool=None):
+        for driver in self.pool.values():
+            driver.volume_define(volume=volume, pool=pool)
+
+    @logwrap
+    def volume_delete(self, volume):
+        for driver in self.pool.values():
+            driver.volume_delete(volume=volume)
+
+    @logwrap
+    def volume_exists(self, volume):
+        for driver in self.pool.values():
+            if driver.volume_exists(volume=volume):
+                return True
+
+    @logwrap
     def volume_path(self, volume):
-        return self.pool.get(volume.node_control.name).volume_path(volume)
+        ret = {}
+        for control in self.pool.keys():
+            ret[control] = self.pool[control].volume_path(volume=volume)
+        return ret

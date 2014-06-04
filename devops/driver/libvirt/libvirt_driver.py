@@ -192,7 +192,14 @@ class DevopsDriver(object):
         """
         :rtype : None
         """
-        self.conn.networkLookupByUUIDString(network.uuid).destroy()
+        try:
+            self.conn.networkLookupByUUIDString(network.uuid).destroy()
+        except libvirt.libvirtError as e:
+            if e.message == 'Requested operation is not valid: ' \
+                            'network is not active':
+                pass
+            else:
+                raise
 
     @logwrap
     @retry()

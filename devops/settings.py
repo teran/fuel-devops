@@ -12,21 +12,14 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import os
 from os import environ
 
 CONTROL_NODES = {
-    'testhost': {
+    'ishishkin-msk': {
         'driver': 'devops.driver.libvirt.libvirt_driver',
         'connection_string': 'qemu+tcp://127.0.0.1/system',
         'storage_pool_name': 'default',
     },
-    'mc0n8': {
-        'driver': 'devops.driver.ipmi.ipmi_driver',
-        'ipmi_user': 'login',
-        'ipmi_password': 'password',
-        'ipmi_host': '123.45.67.89'
-    }
 }
 
 INSTALLED_APPS = ['south', 'devops']
