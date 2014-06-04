@@ -54,6 +54,8 @@ class DriverModel(models.Model):
         """
         cls.driver = driver.DriverManager()
 
+        logger.debug('get_driver returned: %s' % cls.driver)
+
         return cls.driver
 
     @property

@@ -32,9 +32,11 @@ logwrap = debug(logger)
 
 class DevopsDriver(object):
     @logwrap
-    def __init__(self,
-                 connection_string="qemu:///system",
-                 storage_pool_name="default"):
+    def __init__(
+            self,
+            connection_string='qemu:///system',
+            storage_pool_name='default',
+            **driver_parameters):
         self.connection_string = connection_string
         libvirt.virInitialize()
         self.conn = libvirt.open(connection_string)

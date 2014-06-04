@@ -12,27 +12,20 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import os
 from os import environ
 
 CONTROL_NODES = {
-    'srv07-srt': {
+    'testhost': {
         'driver': 'devops.driver.libvirt.libvirt_driver',
-        'connection_string': 'qemu+tcp://srv07-srt.srt.mirantis.net/system',
-        'storage_pool_name': 'default',
-    },
-    'srv08-srt': {
-        'driver': 'devops.driver.libvirt.libvirt_driver',
-        'connection_string': 'qemu+tcp://srv08-srt.srt.mirantis.net/system',
-        'storage_pool_name': 'default',
-    },
-    'srv11-msk': {
-        'driver': 'devops.driver.libvirt.libvirt_driver',
-        'connection_string': 'qemu+tcp://srv11-msk.msk.mirantis.net/system',
+        'connection_string': 'qemu+tcp://127.0.0.1/system',
         'storage_pool_name': 'default',
     },
     'mc0n8': {
-        'driver': 'devops.driver.libvirt.ipmi_driver',
-        'connection_string': 'ipmi://login:password@ipmiaddress',
+        'driver': 'devops.driver.ipmi.ipmi_driver',
+        'ipmi_user': 'login',
+        'ipmi_password': 'password',
+        'ipmi_host': '123.45.67.89'
     }
 }
 

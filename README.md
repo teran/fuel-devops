@@ -13,3 +13,10 @@ other customizations with a few lines of code in system tests.
 Documentation
 -------------
 All documentation can be found here: http://docs.mirantis.com/fuel-dev/devops.html
+
+Dependencies
+------------
+
+ * nfs-kernel-server
+ * nfs-common
+ * ipmitool

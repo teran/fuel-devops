@@ -34,16 +34,17 @@ class DevopsDriver(object):
                          'Method is {0}{1}{2}'.format(name, args, kwargs))
         return default_method
 
-    def __init__(self,
-                 ipmi_user, ipmi_password, ipmi_host,
-                 ipmi_driver_root_dir='/tmp/devops_net_install',
-                 ip_install_server='10.20.0.1',
-                 ip_admin_node='10.20.0.2',
-                 fuel_iso_path='/tmp/fuel.iso',
-                 interface_install_server='eth0',
-                 syslinux_dir='/usr/share/syslinux/',
-                 system_init='not_systemd',
-                 **driver_parameters):
+    def __init__(
+            self,
+            ipmi_user, ipmi_password, ipmi_host,
+            ipmi_driver_root_dir='/tmp/devops_net_install',
+            ip_install_server='10.20.0.1',
+            ip_admin_node='10.20.0.2',
+            fuel_iso_path='/tmp/fuel.iso',
+            interface_install_server='eth0',
+            syslinux_dir='/usr/share/syslinux/',
+            system_init='not_systemd',
+            **driver_parameters):
         self.ipmi_cmd = ['/usr/bin/ipmitool', '-l', 'lan',
                          '-H', ipmi_host, '-U', ipmi_user, '-P', ipmi_password]
         self.ipmi_driver_root_dir = ipmi_driver_root_dir

@@ -31,12 +31,13 @@ class DriverManager():
     @logwrap
     def __init__(self, driver=None):
         logger.info('DriverManager initialized')
-        self.driver = import_module(driver or settings.DRIVER)
         for k in settings.CONTROL_NODES.keys():
             if not self.pool.get(k):
+                self.driver = import_module(
+                    driver or settings.CONTROL_NODES[k]['driver'])
+                logger.info('Initializing %s instance' % self.driver)
                 self.pool[k] = self.driver.DevopsDriver(
-                    **settings.CONTROL_NODES[k]
-                )
+                    **settings.CONTROL_NODES[k])
 
     @logwrap
     def get_allocated_networks(self):
@@ -136,6 +137,15 @@ class DriverManager():
     def network_destroy(self, network):
         for driver in self.pool:
             driver.network_destroy(network=network)
+
+    def node_exists(self, node):
+        for driver in self.pool.values():
+            logger.debug('node_exists: %s' % driver)
+            ne = driver.node_exists(node)
+
+            if ne:
+                return ne
+        return False
 
     @logwrap
     def network_undefine(self, network):
