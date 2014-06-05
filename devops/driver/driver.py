@@ -178,7 +178,7 @@ class DriverManager():
     @logwrap
     def node_define(self, node):
         for driver in self.pool.values():
-            driver.network_define(node)
+            driver.node_define(node)
 
     @logwrap
     def node_get_vnc_port(self, node):
