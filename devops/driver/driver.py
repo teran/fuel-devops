@@ -38,6 +38,14 @@ class DriverManager():
                 logger.info('Initializing %s instance' % self.driver)
                 self.pool[k] = self.driver.DevopsDriver(
                     **settings.CONTROL_NODES[k])
+                from devops.models import NodeControl, Environment
+                env = Environment.objects.all()[0]
+                nc, created = NodeControl.objects.get_or_create(
+                    name=k,
+                    connection_string=settings.CONTROL_NODES[k]['connection_string'],
+                    pool=settings.CONTROL_NODES[k]['storage_pool_name'],
+                    environment=env)
+                nc.save()
 
     @logwrap
     def get_allocated_networks(self):
