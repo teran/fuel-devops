@@ -92,7 +92,7 @@ class DriverManager():
         for control in self.pool.keys():
             ret[control] = self.pool[control].network_active(network=network)
 
-        return ret
+        return False
 
     @logwrap
     def network_define(self, network):
@@ -169,7 +169,7 @@ class DriverManager():
 
     @logwrap
     def network_create(self, network):
-        for driver in self.pool:
+        for driver in self.pool.values():
             driver.network_create(network=network)
 
     @logwrap
@@ -200,6 +200,10 @@ class DriverManager():
     @logwrap
     def node_get_vnc_port(self, node):
         pass
+
+    def node_send_keys(self, node, keys):
+        for driver in self.pool.values():
+            driver.node_send_keys(node, keys)
 
     @logwrap
     def volume_capacity(self, volume):

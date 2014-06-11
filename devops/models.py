@@ -198,8 +198,6 @@ class Network(ExternalModel):
         'passthrough', 'hostdev', null=True)
     ip_network = models.CharField(max_length=255, unique=True)
 
-    def __unicode__(self):
-        return self.name
 
     @property
     def interfaces(self):
