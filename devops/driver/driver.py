@@ -76,7 +76,7 @@ class DriverManager():
             nc = NodeControl.objects.get(nodes__name=node_name)
             return self.pool[nc.name]
         except ObjectDoesNotExist:
-            return None
+            return self.pool.values()[0]
 
     @logwrap
     def disconnect(self, name=None):
@@ -227,3 +227,8 @@ class DriverManager():
         for control in self.pool.keys():
             ret[control] = self.pool[control].volume_path(volume=volume)
         return ret
+
+    @logwrap
+    def volume_upload(self, volume, path):
+        for driver in self.pool.values():
+            driver.volume_upload(volume, path)

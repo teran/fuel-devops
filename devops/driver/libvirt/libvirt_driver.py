@@ -459,11 +459,9 @@ class DevopsDriver(object):
     def volume_path(self, volume):
         return self.conn.storageVolLookupByKey(volume.uuid).path()
 
-    @logwrap
     def chunk_render(self, stream, size, fd):
         return fd.read(size)
 
-    @logwrap
     @retry(count=2)
     def volume_upload(self, volume, path):
         size = _get_file_size(path)
