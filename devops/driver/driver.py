@@ -155,6 +155,11 @@ class DriverManager():
         pass
 
     @logwrap
+    def node_undefine(self, node, undefine_snapshots=False):
+        for driver in self.pool.values():
+            driver.node_undefine(node, undefine_snapshots=undefine_snapshots)
+
+    @logwrap
     def node_undefine_by_name(self, name):
         pass
 
