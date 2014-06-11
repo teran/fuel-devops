@@ -15,8 +15,9 @@
 import logging
 import random
 
-from django.utils.importlib import import_module
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils.importlib import import_module
 
 from devops.helpers.decorators import singleton, debug
 
@@ -71,8 +72,11 @@ class DriverManager():
     @logwrap
     def get_control_driver_by_node_name(self, node_name):
         from devops.models import NodeControl
-        nc = NodeControl.objects.get(nodes__name=node_name)
-        return self.pool[nc.name]
+        try:
+            nc = NodeControl.objects.get(nodes__name=node_name)
+            return self.pool[nc.name]
+        except ObjectDoesNotExist:
+            return None
 
     @logwrap
     def disconnect(self, name=None):
