@@ -15,10 +15,18 @@
 from os import environ
 
 CONTROL_NODES = {
-    'ishishkin-msk': {
+    #'ishishkin-msk': {
+    #    'driver': 'devops.driver.libvirt.libvirt_driver',
+    #    'connection_string': 'qemu+tcp://127.0.0.1:16509/system',
+    #    'storage_pool_name': 'default',
+    #    'capacity': 11,
+    #},
+    'mc2n5-srt.srt': {
         'driver': 'devops.driver.libvirt.libvirt_driver',
-        'connection_string': 'qemu+tcp://127.0.0.1/system',
+        'connection_string':
+     'qemu+tcp://mc2n5-srt.srt.mirantis.net:16509/system',
         'storage_pool_name': 'default',
+        'capacity': 7,
     },
 }
 

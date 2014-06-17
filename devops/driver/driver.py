@@ -27,17 +27,16 @@ logwrap = debug(logger)
 @singleton
 class DriverManager():
     pool = {}
-    driver = None
 
     @logwrap
     def __init__(self, driver=None):
         logger.info('DriverManager initialized')
         for k in settings.CONTROL_NODES.keys():
             if not self.pool.get(k):
-                self.driver = import_module(
+                driver = import_module(
                     driver or settings.CONTROL_NODES[k]['driver'])
-                logger.info('Initializing %s instance' % self.driver)
-                self.pool[k] = self.driver.DevopsDriver(
+                logger.info('Initializing %s instance' % driver)
+                self.pool[k] = driver.DevopsDriver(
                     **settings.CONTROL_NODES[k])
                 from devops.models import NodeControl, Environment
                 env = Environment.objects.all()[0]
@@ -47,6 +46,11 @@ class DriverManager():
                     pool=settings.CONTROL_NODES[k]['storage_pool_name'],
                     environment=env)
                 nc.save()
+
+    @property
+    @logwrap
+    def driver(self):
+        return self.get_random_control_driver()
 
     @logwrap
     def get_allocated_networks(self):
@@ -67,7 +71,7 @@ class DriverManager():
 
     @logwrap
     def get_first_control_driver(self):
-        return self.pool[:1]
+        return self.pool.values()[0]
 
     @logwrap
     def get_control_driver_by_node_name(self, node_name):
@@ -92,7 +96,7 @@ class DriverManager():
         for control in self.pool.keys():
             ret[control] = self.pool[control].network_active(network=network)
 
-        return False
+        return True
 
     @logwrap
     def network_define(self, network):
@@ -101,15 +105,16 @@ class DriverManager():
 
     @logwrap
     def network_exists(self, network):
-        ret = {}
         for control in self.pool.keys():
-            ret[control] = self.pool[control].network_exists(network=network)
+            ret = self.pool[control].network_exists(network=network)
 
-        return ret
+            if ret:
+                return ret
+        return True
 
     @logwrap
     def node_active(self, node):
-        self.get_control_driver_by_node_name(
+        return self.get_control_driver_by_node_name(
             node.name
         ).node_active(node=node)
 
@@ -118,21 +123,26 @@ class DriverManager():
         if node_control:
             self.pool[node_control].node_create(node=node)
         else:
-            self.get_random_control_driver().node_create(node=node)
+            self.driver().node_create(node=node)
 
     @logwrap
     def node_create_snapshot(self, node, name, description):
-        self.get_control_driver_by_node_name(node.name).node_create_snapshot(
-            node=node,
-            name=name,
-            description=description
-        )
+        return self.get_control_driver_by_node_name(
+            node.name
+        ).node_create_snapshot(
+            node=node, name=name, description=description)
 
     @logwrap
     def node_delete_snapshot(self, node, name=None):
-        self.get_control_driver_by_node_name(
+        return self.get_control_driver_by_node_name(
             node.name
         ).node_delete_snapshot(node=node, name=name)
+
+    @logwrap
+    def node_destroy(self, node):
+        return self.get_control_driver_by_node_name(
+            node.name
+        ).node_destroy(node=node)
 
     @logwrap
     def node_list(self):
@@ -156,7 +166,8 @@ class DriverManager():
 
     @logwrap
     def node_suspend(self, node):
-        pass
+        for driver in self.pool.values():
+            driver.node_suspend(node)
 
     @logwrap
     def node_undefine(self, node, undefine_snapshots=False):
@@ -185,7 +196,6 @@ class DriverManager():
             if ne:
                 return ne
         return False
-
 
     @logwrap
     def network_undefine(self, network):
