@@ -91,11 +91,8 @@ class DriverManager():
 
     @logwrap
     def network_active(self, network):
-        ret = {}
-        for control in self.pool.keys():
-            ret[control] = self.pool[control].network_active(network=network)
-
-        return True
+        return self.pool[network.node_control.name].network_active(
+            network=network)
 
     @logwrap
     def network_define(self, network):

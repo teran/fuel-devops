@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import datetime
+from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
@@ -7,35 +7,33 @@ from django.db import models
 
 class Migration(SchemaMigration):
     def forwards(self, orm):
-        # Adding model 'NodeControl'
-        db.create_table(u'devops_nodecontrol', (
-            (u'id',
-             self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name',
-             self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('host',
-             self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('port',
-             self.gf('django.db.models.fields.IntegerField')(max_length=5)),
-            ('environment',
-             self.gf('django.db.models.fields.related.ForeignKey')(
-                 related_name='node_controls', to=orm['devops.Environment'])),
-        ))
-        db.send_create_signal(u'devops', ['NodeControl'])
+        # Changing field 'Node.node_control'
+        db.alter_column(u'devops_node', 'node_control_id',
+                        self.gf('django.db.models.fields.related.ForeignKey')(
+                            to=orm['devops.NodeControl'], null=True))
 
-        # Adding field 'Node.node_control'
-        db.add_column(u'devops_node', 'node_control',
-                      self.gf('django.db.models.fields.related.ForeignKey')(
-                          related_name='nodes', null=True,
-                          to=orm['devops.NodeControl']),
-                      keep_default=False)
+        # Changing field 'Volume.node_control'
+        db.alter_column(u'devops_volume', 'node_control_id',
+                        self.gf('django.db.models.fields.related.ForeignKey')(
+                            to=orm['devops.NodeControl'], null=True))
+
+        # Changing field 'Network.node_control'
+        db.alter_column(u'devops_network', 'node_control_id',
+                        self.gf('django.db.models.fields.related.ForeignKey')(
+                            to=orm['devops.NodeControl'], null=True))
 
     def backwards(self, orm):
-        # Deleting model 'NodeControl'
-        db.delete_table(u'devops_nodecontrol')
+        # User chose to not deal with backwards NULL issues for 'Node.node_control'
+        raise RuntimeError(
+            "Cannot reverse this migration. 'Node.node_control' and its values cannot be restored.")
 
-        # Deleting field 'Node.node_control'
-        db.delete_column(u'devops_node', 'node_control_id')
+        # User chose to not deal with backwards NULL issues for 'Volume.node_control'
+        raise RuntimeError(
+            "Cannot reverse this migration. 'Volume.node_control' and its values cannot be restored.")
+
+        # User chose to not deal with backwards NULL issues for 'Network.node_control'
+        raise RuntimeError(
+            "Cannot reverse this migration. 'Network.node_control' and its values cannot be restored.")
 
     models = {
         u'devops.address': {
@@ -104,11 +102,8 @@ class Migration(SchemaMigration):
             'forward': ('django.db.models.fields.CharField', [],
                         {'max_length': '255', 'null': 'True'}),
             'has_dhcp_server': (
-                'django.db.models.fields.BooleanField', [],
-                {'default': 'False'}),
-            'has_pxe_server': (
-                'django.db.models.fields.BooleanField', [],
-                {'default': 'False'}),
+                'django.db.models.fields.BooleanField', [], {}),
+            'has_pxe_server': ('django.db.models.fields.BooleanField', [], {}),
             'has_reserved_ips': (
                 'django.db.models.fields.BooleanField', [],
                 {'default': 'True'}),
@@ -120,6 +115,9 @@ class Migration(SchemaMigration):
             'name': (
                 'django.db.models.fields.CharField', [],
                 {'max_length': '255'}),
+            'node_control': ('django.db.models.fields.related.ForeignKey', [],
+                             {'to': u"orm['devops.NodeControl']",
+                              'null': 'True', 'blank': 'True'}),
             'tftp_root_dir': (
                 'django.db.models.fields.CharField', [],
                 {'max_length': '255'}),
@@ -155,8 +153,8 @@ class Migration(SchemaMigration):
                 'django.db.models.fields.CharField', [],
                 {'max_length': '255'}),
             'node_control': ('django.db.models.fields.related.ForeignKey', [],
-                             {'related_name': "'nodes'", 'null': 'True',
-                              'to': u"orm['devops.NodeControl']"}),
+                             {'to': u"orm['devops.NodeControl']",
+                              'null': 'True', 'blank': 'True'}),
             'os_type': (
                 'django.db.models.fields.CharField', [],
                 {'max_length': '255'}),
@@ -170,21 +168,20 @@ class Migration(SchemaMigration):
         },
         u'devops.nodecontrol': {
             'Meta': {'object_name': 'NodeControl'},
+            'connection_string': (
+                'django.db.models.fields.CharField', [],
+                {'max_length': '255'}),
             'environment': ('django.db.models.fields.related.ForeignKey', [],
                             {'related_name': "'node_controls'",
                              'to': u"orm['devops.Environment']"}),
-            'host': (
-                'django.db.models.fields.CharField', [],
-                {'max_length': '255'}),
             u'id': (
                 'django.db.models.fields.AutoField', [],
                 {'primary_key': 'True'}),
             'name': (
                 'django.db.models.fields.CharField', [],
                 {'max_length': '255'}),
-            'port': (
-                'django.db.models.fields.IntegerField', [],
-                {'max_length': '5'})
+            'pool': (
+                'django.db.models.fields.CharField', [], {'max_length': '255'})
         },
         u'devops.volume': {
             'Meta': {'unique_together': "(('name', 'environment'),)",
@@ -204,6 +201,9 @@ class Migration(SchemaMigration):
             'name': (
                 'django.db.models.fields.CharField', [],
                 {'max_length': '255'}),
+            'node_control': ('django.db.models.fields.related.ForeignKey', [],
+                             {'to': u"orm['devops.NodeControl']",
+                              'null': 'True', 'blank': 'True'}),
             'uuid': (
                 'django.db.models.fields.CharField', [], {'max_length': '255'})
         }

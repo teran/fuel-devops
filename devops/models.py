@@ -172,10 +172,20 @@ class Environment(DriverModel):
                     (0, len(nodes_to_remove)))
 
 
+class NodeControl(DriverModel):
+    name = models.CharField(max_length=255)
+    connection_string = models.CharField(max_length=255)
+    pool = models.CharField(max_length=255)
+    environment = models.ForeignKey(Environment, related_name='node_controls')
+
+    def __unicode__(self):
+        return self.name
+
 class ExternalModel(DriverModel):
     name = models.CharField(max_length=255, unique=False, null=False)
     uuid = models.CharField(max_length=255)
     environment = models.ForeignKey(Environment, null=True)
+    node_control = models.ForeignKey(NodeControl, null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -197,9 +207,6 @@ class Network(ExternalModel):
         'nat', 'route', 'bridge', 'private', 'vepa',
         'passthrough', 'hostdev', null=True)
     ip_network = models.CharField(max_length=255, unique=True)
-    node_control = models.ForeignKey(
-        NodeControl, related_name='networks')
-
 
     @property
     def interfaces(self):
@@ -254,16 +261,6 @@ class Network(ExternalModel):
         self.delete()
 
 
-class NodeControl(DriverModel):
-    name = models.CharField(max_length=255)
-    connection_string = models.CharField(max_length=255)
-    pool = models.CharField(max_length=255)
-    environment = models.ForeignKey(Environment, related_name='node_controls')
-
-    def __unicode__(self):
-        return self.name
-
-
 class Node(ExternalModel):
     hypervisor = choices('kvm')
     os_type = choices('hvm')
@@ -274,8 +271,6 @@ class Node(ExternalModel):
     vcpu = models.PositiveSmallIntegerField(null=False, default=1)
     memory = models.IntegerField(null=False, default=1024)
     has_vnc = models.BooleanField(null=False, default=True)
-    node_control = models.ForeignKey(
-        NodeControl, related_name='nodes')
 
     def __unicode__(self):
         return self.name
@@ -381,8 +376,6 @@ class Volume(ExternalModel):
     capacity = models.BigIntegerField(null=False)
     backing_store = models.ForeignKey('self', null=True)
     format = models.CharField(max_length=255, null=False)
-    node_control = models.ForeignKey(
-        NodeControl, related_name='volumes')
 
     def define(self):
         self.driver.volume_define(self)
