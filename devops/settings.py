@@ -21,10 +21,10 @@ CONTROL_NODES = {
     #    'storage_pool_name': 'default',
     #    'capacity': 11,
     #},
-    'mc2n5-srt.srt': {
+    'mc0n3-msk.msk': {
         'driver': 'devops.driver.libvirt.libvirt_driver',
         'connection_string':
-     'qemu+tcp://mc2n5-srt.srt.mirantis.net:16509/system',
+     'qemu+tcp://mc0n3-msk.msk.mirantis.net:16509/system',
         'storage_pool_name': 'default',
         'capacity': 7,
     },

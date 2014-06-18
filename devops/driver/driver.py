@@ -47,7 +47,6 @@ class DriverManager():
                     environment=env)
                 nc.save()
 
-    @property
     @logwrap
     def driver(self):
         return self.get_random_control_driver()

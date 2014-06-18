@@ -197,6 +197,8 @@ class Network(ExternalModel):
         'nat', 'route', 'bridge', 'private', 'vepa',
         'passthrough', 'hostdev', null=True)
     ip_network = models.CharField(max_length=255, unique=True)
+    node_control = models.ForeignKey(
+        NodeControl, related_name='networks')
 
 
     @property
@@ -273,7 +275,7 @@ class Node(ExternalModel):
     memory = models.IntegerField(null=False, default=1024)
     has_vnc = models.BooleanField(null=False, default=True)
     node_control = models.ForeignKey(
-        NodeControl, related_name='nodes', null=True)
+        NodeControl, related_name='nodes')
 
     def __unicode__(self):
         return self.name
@@ -380,7 +382,7 @@ class Volume(ExternalModel):
     backing_store = models.ForeignKey('self', null=True)
     format = models.CharField(max_length=255, null=False)
     node_control = models.ForeignKey(
-        NodeControl, related_name='volumes', null=True)
+        NodeControl, related_name='volumes')
 
     def define(self):
         self.driver.volume_define(self)
