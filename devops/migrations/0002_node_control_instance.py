@@ -7,33 +7,54 @@ from django.db import models
 
 class Migration(SchemaMigration):
     def forwards(self, orm):
-        # Changing field 'Node.node_control'
-        db.alter_column(u'devops_node', 'node_control_id',
-                        self.gf('django.db.models.fields.related.ForeignKey')(
-                            to=orm['devops.NodeControl'], null=True))
+        # Adding model 'NodeControl'
+        db.create_table(u'devops_nodecontrol', (
+            (u'id',
+             self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name',
+             self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('connection_string',
+             self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('pool',
+             self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('environment',
+             self.gf('django.db.models.fields.related.ForeignKey')(
+                 related_name='node_controls', to=orm['devops.Environment'])),
+        ))
+        db.send_create_signal(u'devops', ['NodeControl'])
 
-        # Changing field 'Volume.node_control'
-        db.alter_column(u'devops_volume', 'node_control_id',
-                        self.gf('django.db.models.fields.related.ForeignKey')(
-                            to=orm['devops.NodeControl'], null=True))
+        # Adding field 'Node.node_control'
+        db.add_column(u'devops_node', 'node_control',
+                      self.gf('django.db.models.fields.related.ForeignKey')(
+                          to=orm['devops.NodeControl'], null=True, blank=True),
+                      keep_default=False)
 
-        # Changing field 'Network.node_control'
-        db.alter_column(u'devops_network', 'node_control_id',
-                        self.gf('django.db.models.fields.related.ForeignKey')(
-                            to=orm['devops.NodeControl'], null=True))
+        # Adding field 'Volume.node_control'
+        db.add_column(u'devops_volume', 'node_control',
+                      self.gf('django.db.models.fields.related.ForeignKey')(
+                          to=orm['devops.NodeControl'], null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'Network.node_control'
+        db.add_column(u'devops_network', 'node_control',
+                      self.gf('django.db.models.fields.related.ForeignKey')(
+                          to=orm['devops.NodeControl'], null=True, blank=True),
+                      keep_default=False)
+
 
     def backwards(self, orm):
-        # User chose to not deal with backwards NULL issues for 'Node.node_control'
-        raise RuntimeError(
-            "Cannot reverse this migration. 'Node.node_control' and its values cannot be restored.")
+        # Deleting model 'NodeControl'
+        db.delete_table(u'devops_nodecontrol')
 
-        # User chose to not deal with backwards NULL issues for 'Volume.node_control'
-        raise RuntimeError(
-            "Cannot reverse this migration. 'Volume.node_control' and its values cannot be restored.")
+        # Deleting field 'Node.node_control'
+        db.delete_column(u'devops_node', 'node_control_id')
 
-        # User chose to not deal with backwards NULL issues for 'Network.node_control'
-        raise RuntimeError(
-            "Cannot reverse this migration. 'Network.node_control' and its values cannot be restored.")
+        # Deleting field 'Volume.node_control'
+        db.delete_column(u'devops_volume', 'node_control_id')
+
+        # Deleting field 'Network.node_control'
+        db.delete_column(u'devops_network', 'node_control_id')
+
 
     models = {
         u'devops.address': {
@@ -210,3 +231,4 @@ class Migration(SchemaMigration):
     }
 
     complete_apps = ['devops']
+    
