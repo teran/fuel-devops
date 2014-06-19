@@ -65,6 +65,12 @@ class DriverManager():
         return self.pool[name]
 
     @logwrap
+    def get_control_object_by_driver(self, driver):
+        from devops.models import NodeControl
+        return NodeControl.objects.get(
+            connection_string=driver.connection_string)
+
+    @logwrap
     def get_random_control_driver(self):
         return self.pool[random.choice(self.pool.keys())]
 
@@ -76,7 +82,7 @@ class DriverManager():
     def get_control_driver_by_node_name(self, node_name):
         from devops.models import NodeControl
         try:
-            nc = NodeControl.objects.get(nodes__name=node_name)
+            nc = NodeControl.objects.get(node__name=node_name)
             return self.pool[nc.name]
         except ObjectDoesNotExist:
             return self.pool.values()[0]
@@ -98,6 +104,7 @@ class DriverManager():
     def network_define(self, network):
         for driver in self.pool.values():
             driver.network_define(network=network)
+            network.node_control = self.get_control_object_by_driver(driver)
 
     @logwrap
     def network_exists(self, network):
