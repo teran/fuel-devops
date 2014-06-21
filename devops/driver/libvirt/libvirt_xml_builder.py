@@ -19,6 +19,7 @@ from ipaddr import IPNetwork, IPAddress
 from xmlbuilder import XMLBuilder
 
 from devops.helpers.decorators import debug
+from devops import settings
 
 logger = logging.getLogger(__name__)
 logwrap = debug(logger)
@@ -51,6 +52,10 @@ class LibvirtXMLBuilder(object):
             network.name))
         network_xml.bridge(name="dobr{0}".format(network.id),
                            stp="on", delay="0")
+
+        if settings.OPENVSWITCH:
+            network_xml.virtualport(type='openvswitch')
+
         if not (network.forward is None):
             network_xml.forward(mode=network.forward)
         if not (network.ip_network is None):

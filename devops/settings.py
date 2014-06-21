@@ -14,6 +14,9 @@
 
 from os import environ
 
+OPENVSWITCH = True
+NETWORK_VLAN_TAGS = range(100,200)
+
 CONTROL_NODES = {
     #'ishishkin-msk': {
     #    'driver': 'devops.driver.libvirt.libvirt_driver',
