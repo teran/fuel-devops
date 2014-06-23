@@ -126,7 +126,7 @@ class LibvirtXMLBuilder(object):
 
     @logwrap
     def _build_interface_device(self, device_xml, interface):
-        if interface.type != 'network':
+        if interface.type not in ['network', 'bridge']:
             raise NotImplementedError(
                 message='Interface types different from network are not '
                         'implemented yet')
@@ -137,6 +137,9 @@ class LibvirtXMLBuilder(object):
             device_xml.target(dev="donet{0}".format(interface.id))
             if not (interface.type is None):
                 device_xml.model(type=interface.model)
+
+            if settings.OPENVSWITCH:
+                device_xml.virtualport(type='openvswitch')
 
     @logwrap
     def build_node_xml(self, node, emulator):
@@ -175,12 +178,17 @@ class LibvirtXMLBuilder(object):
 
             for disk_device in node.disk_devices:
                 self._build_disk_device(node_xml, disk_device)
+
             for interface in node.interfaces:
                 self._build_interface_device(node_xml, interface)
+
             with node_xml.video:
                 node_xml.model(type='vga', vram='9216', heads='1')
+
             with node_xml.serial(type='pty'):
                 node_xml.target(port='0')
+
             with node_xml.console(type='pty'):
                 node_xml.target(type='serial', port='0')
+
         return str(node_xml)
