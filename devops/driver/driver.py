@@ -88,6 +88,16 @@ class DriverManager():
             return self.pool.values()[0]
 
     @logwrap
+    def get_network_by_driver_object(self, driver, network):
+        from devops.models import Network
+
+
+        return Network.objects.get(
+            #node_control=self.get_control_object_by_driver(driver),
+            name=network.name,
+        )
+
+    @logwrap
     def disconnect(self, name=None):
         if name:
             self.pool[name].close()
@@ -186,7 +196,14 @@ class DriverManager():
     @logwrap
     def network_create(self, network):
         for driver in self.pool.values():
-            driver.network_create(network=network)
+            try:
+                self.get_network_by_driver_object(
+                    network=network, driver=driver)
+                driver.network_create(network=network)
+            except:
+                from devops.models import Network
+                network.pk = None
+                driver.network_create(network=network)
 
     @logwrap
     def network_destroy(self, network):
@@ -205,7 +222,10 @@ class DriverManager():
     @logwrap
     def network_undefine(self, network):
         for driver in self.pool.values():
-            driver.network_undefine(network=network)
+            driver.network_undefine(
+                network=self.get_network_by_driver_object(
+                    driver=driver, network=network))
+
 
     @logwrap
     def node_define(self, node):

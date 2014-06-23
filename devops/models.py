@@ -13,6 +13,7 @@
 #    under the License.
 
 import json
+import logging
 
 from ipaddr import IPNetwork
 
@@ -20,10 +21,13 @@ from django.conf import settings
 from django.db import models
 
 from devops.helpers.helpers import SSHClient, _wait, _tcp_ping
+from devops.helpers.decorators import debug
 
 from devops.driver import driver
 from devops import logger
 
+logger = logging.getLogger(__name__)
+logwrap = debug(logger)
 
 def choices(*args, **kwargs):
     defaults = {'max_length': 255, 'null': False}
@@ -187,7 +191,7 @@ class ExternalModel(DriverModel):
 
     class Meta:
         abstract = True
-        unique_together = ('name', 'environment')
+        unique_together = ('name', 'environment', 'node_control',)
 
     @classmethod
     def get_allocated_networks(cls):
@@ -230,26 +234,33 @@ class Network(ExternalModel):
                     ip_address=str(ip)).exists():
                 return ip
 
+    @logwrap
     def bridge_name(self):
         return self.driver.network_bridge_name(self)
 
+    @logwrap
     def define(self):
         self.driver.network_define(self)
         self.save()
 
+    @logwrap
     def start(self):
         self.create(verbose=False)
 
+    @logwrap
     def create(self, verbose=False):
         if verbose or not self.driver.network_active(self):
             self.driver.network_create(self)
 
+    @logwrap
     def destroy(self):
         self.driver.network_destroy(self)
 
+    @logwrap
     def erase(self):
         self.remove(verbose=False)
 
+    @logwrap
     def remove(self, verbose=False):
         if verbose or self.uuid:
             if verbose or self.driver.network_exists(self):
