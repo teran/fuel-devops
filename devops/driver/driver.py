@@ -169,13 +169,15 @@ class DriverManager():
 
     @logwrap
     def node_suspend(self, node):
-        for driver in self.pool.values():
-            driver.node_suspend(node)
+        return self.get_control_driver_by_node_name(
+            node.name
+        ).node_suspend(node=node)
 
     @logwrap
     def node_undefine(self, node, undefine_snapshots=False):
-        for driver in self.pool.values():
-            driver.node_undefine(node, undefine_snapshots=undefine_snapshots)
+        return self.get_control_driver_by_node_name(
+            node.name
+        ).node_undefine(node, undefine_snapshots=undefine_snapshots)
 
     @logwrap
     def node_undefine_by_name(self, name):
