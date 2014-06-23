@@ -18,12 +18,12 @@ OPENVSWITCH = True
 NETWORK_VLAN_TAGS = range(100,200)
 
 CONTROL_NODES = {
-    #'ishishkin-msk': {
-    #    'driver': 'devops.driver.libvirt.libvirt_driver',
-    #    'connection_string': 'qemu+tcp://127.0.0.1:16509/system',
-    #    'storage_pool_name': 'default',
-    #    'capacity': 11,
-    #},
+    'ishishkin-msk': {
+        'driver': 'devops.driver.libvirt.libvirt_driver',
+        'connection_string': 'qemu+tcp://127.0.0.1:16509/system',
+        'storage_pool_name': 'default',
+        'capacity': 11,
+    },
     'mc0n3-msk.msk': {
         'driver': 'devops.driver.libvirt.libvirt_driver',
         'connection_string':

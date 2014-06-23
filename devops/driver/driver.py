@@ -29,13 +29,13 @@ class DriverManager():
     pool = {}
 
     @logwrap
-    def __init__(self, driver=None):
+    def __init__(self):
         logger.info('DriverManager initialized')
         for k in settings.CONTROL_NODES.keys():
             if not self.pool.get(k):
-                driver = import_module(
-                    driver or settings.CONTROL_NODES[k]['driver'])
+                driver = import_module(settings.CONTROL_NODES[k]['driver'])
                 logger.info('Initializing %s instance' % driver)
+
                 self.pool[k] = driver.DevopsDriver(
                     **settings.CONTROL_NODES[k])
                 from devops.models import NodeControl, Environment
@@ -207,8 +207,9 @@ class DriverManager():
 
     @logwrap
     def node_define(self, node):
-        for driver in self.pool.values():
-            driver.node_define(node)
+        driver = self.get_random_control_driver()
+        driver.node_define(node)
+        node.node_control = self.get_control_object_by_driver(driver=driver)
 
     @logwrap
     def node_get_vnc_port(self, node):
