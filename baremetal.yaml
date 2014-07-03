@@ -1,0 +1,86 @@
+common:
+  ipmi:
+        user: lol
+        password: lol
+  switch:
+    host: cs12-blah.lol.com
+  networks:
+    vlan:
+      admin: 222
+      private: 223
+      management: 224
+      public: 225
+nodes:
+  mc0n1-msk.msk.mirantis.net:
+    ipmi:
+        host: blah.com
+    interfaces:
+      eth0:
+        mac: 00:00:00:00:00
+        network: admin
+        port: Gi0/1
+      eth1:
+        mac: 00:00:00:00:00
+        network: private
+        port: Gi0/2
+      eth2:
+        mac: 00:00:00:00:00
+        network: management
+        port: Gi0/3
+      eth3:
+        mac: 00:00:00:00:00
+        network: public
+        port: Gi0/4
+    disks:
+      system: /dev/sda
+    role: admin
+  mc0n2-msk.msk.mirantis.net:
+    ipmi:
+        host: blah.com
+    interfaces:
+      eth0:
+        mac: 00:00:00:00:00
+        network: admin
+        port: Gi0/5
+      eth1:
+        mac: 00:00:00:00:00
+        network: private
+        port: Gi0/6
+      eth2:
+        mac: 00:00:00:00:00
+        network: management
+        port: Gi0/7
+      eth3:
+        mac: 00:00:00:00:00
+        network: public
+        port: Gi0/8
+    disks:
+      system: /dev/sda
+      swift: /dev/sdb
+      cinder: /dev/sdc
+    role: slave-01
+  mc0n3-msk.msk.mirantis.net:
+    ipmi:
+        host: blah.com
+    interfaces:
+      eth0:
+        mac: 00:00:00:00:00
+        network: admin
+        port: Gi0/9
+      eth1:
+        mac: 00:00:00:00:00
+        network: private
+        port: Gi0/10
+      eth2:
+        mac: 00:00:00:00:00
+        network: management
+        port: Gi0/11
+      eth3:
+        mac: 00:00:00:00:00
+        network: public
+        port: Gi0/12
+    disks:
+      system: /dev/sda
+      swift: /dev/sdb
+      cinder: /dev/sdc
+    role: slave-03
